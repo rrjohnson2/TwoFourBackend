@@ -2,25 +2,16 @@ package com.jsware.loop.twofour.model;
 
 public class Ticket {
 	
-	private String email;
-	private String phone;
+	private String id;
 	
 	private Object data;
 
-	public String getEmail() {
-		return email;
+	public String getId() {
+		return id;
 	}
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
-	public String getPhone() {
-		return phone;
-	}
-
-	public void setPhone(String phone) {
-		this.phone = phone;
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	public Object getData() {
