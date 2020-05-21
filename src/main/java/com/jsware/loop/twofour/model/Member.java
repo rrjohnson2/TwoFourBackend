@@ -43,6 +43,12 @@ public class Member {
 	
 	private  int post_count = 1;
 	
+	private String facebook;
+	
+	private String instgram;
+	 
+	private String twitter;
+	
 	public boolean isVerified() {
 		return verified;
 	}
@@ -105,6 +111,30 @@ public class Member {
 
 	public void setSaltyPassword(String saltyPassword) {
 		this.saltyPassword = saltyPassword;
+	}
+
+	public String getFacebook() {
+		return facebook;
+	}
+
+	public void setFacebook(String facebook) {
+		this.facebook = facebook;
+	}
+
+	public String getInstgram() {
+		return instgram;
+	}
+
+	public void setInstgram(String instgram) {
+		this.instgram = instgram;
+	}
+
+	public String getTwitter() {
+		return twitter;
+	}
+
+	public void setTwitter(String twitter) {
+		this.twitter = twitter;
 	}
 
 	public void setPassword(String password)

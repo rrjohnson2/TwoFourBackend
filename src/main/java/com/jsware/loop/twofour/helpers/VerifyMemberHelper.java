@@ -5,8 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
+import org.springframework.stereotype.Component;
+
 import com.jsware.loop.twofour.model.Member;
 
+@Component
 public class VerifyMemberHelper {
 	
 	public List<Member> unverified = new ArrayList<Member>();

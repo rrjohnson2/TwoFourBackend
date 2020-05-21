@@ -16,8 +16,10 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jsware.loop.twofour.constants.AppConstants;
 import com.jsware.loop.twofour.helpers.VerifyMemberHelper;
+import com.jsware.loop.twofour.model.Contest;
 import com.jsware.loop.twofour.model.Member;
 import com.jsware.loop.twofour.model.Ticket;
+import com.jsware.loop.twofour.repo.ContestRepo;
 import com.jsware.loop.twofour.repo.MemberRepo;
 
 
@@ -28,18 +30,27 @@ public class MainController {
 	@Autowired
 	private MemberRepo memRepo;
 	
-	private AppConstants constants= new AppConstants();
 	
-	private VerifyMemberHelper verify = new VerifyMemberHelper();
-	
+	private ContestRepo contestRepo;
+	private AppConstants constants;
+	private VerifyMemberHelper verify;
 	private ObjectMapper mapper;
 	
 	
 	@Autowired
-	public MainController(ObjectMapper mapper) {
+	public MainController(ObjectMapper mapper, AppConstants constants, VerifyMemberHelper verify, ContestRepo contestRepo) {
 		super();
+		this.verify = verify;
+		this.constants = constants;
 		this.mapper=mapper;
+		this.contestRepo = contestRepo;
+		
+		
 		this.mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+		
+		Contest temp = contestRepo.findLastest();
+		constants.activeContest = temp !=null ? temp : new Contest() ;
+		if(temp == null) contestRepo.save(constants.activeContest);
 	}
 	
 	@RequestMapping(value="/login",method=RequestMethod.POST)
@@ -151,22 +162,13 @@ public class MainController {
 		}
 	}
 	
-	@RequestMapping(value="/getContestTime",method=RequestMethod.GET)
+	@RequestMapping(value="/getContest",method=RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<Date> getContestTime()
+	public ResponseEntity<Contest> getContest()
 	{
 		return ResponseEntity
 	            .status(HttpStatus.ACCEPTED)                 
-	            .body(constants.contestTime);
-	}
-	
-	@RequestMapping(value="/getSubCount",method=RequestMethod.GET)
-	@ResponseBody
-	public ResponseEntity<Integer> getSubCount()
-	{
-		return ResponseEntity
-	            .status(HttpStatus.ACCEPTED)                 
-	            .body(constants.sub_count);
+	            .body(constants.activeContest);
 	}
 	
 	
