@@ -88,11 +88,10 @@ public class MainController {
 		try {
 			if(!memRepo.existByEmailorPhoneorUsername(mem.getEmail(), mem.getPhone(),mem.getUsername()))
 			{
-				//sendEmailorTextMessage
 				verify.addMember(mem);
 				return ResponseEntity
-			            .status(HttpStatus.CREATED)                 
-			            .body("CODE GENERATED");
+			            .status(HttpStatus.ACCEPTED)                 
+			            .body(null);
 			}
 			
 			return ResponseEntity

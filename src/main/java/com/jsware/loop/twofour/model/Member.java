@@ -6,6 +6,8 @@ import java.util.Random;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -40,12 +42,18 @@ public class Member {
 	
 	private boolean verified;
 	
+	private boolean newsletter;
 	
-	private  int post_count = 1;
+	@Enumerated(EnumType.STRING)
+	private MessageMedium messageMedium;
+	
+	private boolean notify;
+	
+	private  int post_count;
 	
 	private String facebook;
 	
-	private String instgram;
+	private String instagram;
 	 
 	private String twitter;
 	
@@ -121,12 +129,12 @@ public class Member {
 		this.facebook = facebook;
 	}
 
-	public String getInstgram() {
-		return instgram;
+	public String getInstagram() {
+		return instagram;
 	}
 
-	public void setInstgram(String instgram) {
-		this.instgram = instgram;
+	public void setInstagram(String instgram) {
+		this.instagram = instgram;
 	}
 
 	public String getTwitter() {
@@ -135,6 +143,30 @@ public class Member {
 
 	public void setTwitter(String twitter) {
 		this.twitter = twitter;
+	}
+
+	public boolean isNewsletter() {
+		return newsletter;
+	}
+
+	public void setNewsletter(boolean newsletter) {
+		this.newsletter = newsletter;
+	}
+
+	public MessageMedium getMessageMedium() {
+		return messageMedium;
+	}
+
+	public void setMessageMedium(MessageMedium messageMedium) {
+		this.messageMedium = messageMedium;
+	}
+
+	public boolean isNotify() {
+		return notify;
+	}
+
+	public void setNotify(boolean notify) {
+		this.notify = notify;
 	}
 
 	public void setPassword(String password)
