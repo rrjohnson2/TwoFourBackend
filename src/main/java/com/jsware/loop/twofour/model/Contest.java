@@ -31,11 +31,17 @@ public class Contest {
 	
 	public String winning_content_url;
 	
+	public String content_type;
+	
 	@SuppressWarnings("deprecation")
 	public Contest() {
 		Date today = new Date();
 		calendar.setTime(new Date());
-		calendar.set(today.getYear(), today.getMonth(), today.getDate()+1, 12, 0, 0);
+		calendar.add(Calendar.DATE, 1);
+		calendar.set(Calendar.HOUR_OF_DAY, 12);
+		calendar.set(Calendar.MINUTE, 0);
+		calendar.set(Calendar.SECOND, 0);
+		calendar.set(Calendar.MILLISECOND, 0);
 		sub_count = 0;
 	}
 	
