@@ -1,5 +1,6 @@
 package com.jsware.loop.twofour.controller;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -51,8 +52,43 @@ public class MainController {
 		Contest temp = contestRepo.findLastest();
 		constants.activeContest = temp !=null ? temp : new Contest() ;
 		if(temp == null) contestRepo.save(constants.activeContest);
+		
+		manageContest();
 	}
 	
+	private void manageContest() {
+		
+		new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				boolean good = true;
+				while(good)
+				{
+					Calendar now = Calendar.getInstance();
+					now.setTime(new Date());
+					
+					try {
+						Thread.sleep(constants.activeContest.calendar.getTimeInMillis() - now.getTimeInMillis());
+						if(constants.activeContest.winner !=null) /** choose winner**/;
+						
+						constants.activeContest= new Contest();
+						
+						contestRepo.save(constants.activeContest);
+						
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				
+				
+			}
+		}).start();
+		
+		
+	}
+
 	@RequestMapping(value="/login",method=RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<Member> login(@RequestBody Ticket ticket)
@@ -169,6 +205,8 @@ public class MainController {
 	            .status(HttpStatus.ACCEPTED)                 
 	            .body(constants.activeContest);
 	}
+	
+	
 	
 	
 	
