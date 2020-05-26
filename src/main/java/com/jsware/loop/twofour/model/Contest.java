@@ -45,5 +45,13 @@ public class Contest {
 		sub_count = 0;
 	}
 	
+	public void loadSubmission(Submission sub)
+	{
+		winning_description = sub.description;
+		winner = sub.member;
+		winning_content_url = sub.content_url;
+		content_type = sub.content_type;
+	}
+	
 	
 }

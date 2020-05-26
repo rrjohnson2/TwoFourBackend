@@ -19,6 +19,8 @@ import com.jsware.loop.twofour.constants.AppConstants;
 import com.jsware.loop.twofour.helpers.VerifyMemberHelper;
 import com.jsware.loop.twofour.model.Contest;
 import com.jsware.loop.twofour.model.Member;
+import com.jsware.loop.twofour.model.Submission;
+import com.jsware.loop.twofour.model.SubmissionTicket;
 import com.jsware.loop.twofour.model.Ticket;
 import com.jsware.loop.twofour.repo.ContestRepo;
 import com.jsware.loop.twofour.repo.MemberRepo;
@@ -215,6 +217,15 @@ public class MainController {
 		return ResponseEntity
 	            .status(HttpStatus.ACCEPTED)                 
 	            .body(constants.previousContest);
+	}
+	
+	@RequestMapping(value="/submit",method=RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<SubmissionTicket> submit(@RequestBody Submission sub)
+	{
+		return ResponseEntity
+	            .status(HttpStatus.ACCEPTED)                 
+	            .body(constants.submit(sub));
 	}
 	
 	
