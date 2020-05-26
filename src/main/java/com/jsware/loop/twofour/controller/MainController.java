@@ -49,9 +49,9 @@ public class MainController {
 		
 		this.mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 		
-		Contest temp = contestRepo.findLastest();
-		constants.activeContest = temp !=null ? temp : new Contest() ;
-		if(temp == null) contestRepo.save(constants.activeContest);
+		constants.previousContest= contestRepo.findLastest();
+		constants.activeContest = new Contest() ;
+		contestRepo.save(constants.activeContest);
 		
 		manageContest();
 	}
@@ -71,6 +71,8 @@ public class MainController {
 					try {
 						Thread.sleep(constants.activeContest.calendar.getTimeInMillis() - now.getTimeInMillis());
 						if(constants.activeContest.winner !=null) /** choose winner**/;
+						
+						constants.previousContest = constants.activeContest;
 						
 						constants.activeContest= new Contest();
 						
@@ -204,6 +206,15 @@ public class MainController {
 		return ResponseEntity
 	            .status(HttpStatus.ACCEPTED)                 
 	            .body(constants.activeContest);
+	}
+	
+	@RequestMapping(value="/getPreviousContest",method=RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<Contest> getPreviousContest()
+	{
+		return ResponseEntity
+	            .status(HttpStatus.ACCEPTED)                 
+	            .body(constants.previousContest);
 	}
 	
 	

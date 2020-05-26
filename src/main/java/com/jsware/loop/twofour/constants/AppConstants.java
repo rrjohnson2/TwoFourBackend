@@ -10,5 +10,7 @@ import com.jsware.loop.twofour.model.Contest;
 public class AppConstants {
 
 	public Contest activeContest;
+	
+	public Contest previousContest;
 
 }
