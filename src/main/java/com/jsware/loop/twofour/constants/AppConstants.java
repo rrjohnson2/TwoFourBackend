@@ -37,6 +37,7 @@ public class AppConstants {
 	
 	public SubmissionTicket submit(Submission sub)
 	{
+		activeContest.sub_count++;
 		String backupSlot = null;
 		if(count < backups.length)
 		{

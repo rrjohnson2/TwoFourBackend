@@ -3,6 +3,7 @@ package com.jsware.loop.twofour.controller;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.function.Consumer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -77,6 +78,18 @@ public class MainController {
 						constants.previousContest = constants.activeContest;
 						
 						constants.activeContest= new Contest();
+						
+						Iterable<Member> members = memRepo.findAll();
+						members.forEach(new Consumer<Member>() {
+
+							@Override
+							public void accept(Member member) {
+								member.setPost_count(1);
+								
+							}
+							
+						});
+						memRepo.saveAll(members);
 						
 						contestRepo.save(constants.activeContest);
 						
@@ -223,8 +236,12 @@ public class MainController {
 	@ResponseBody
 	public ResponseEntity<SubmissionTicket> submit(@RequestBody Submission sub)
 	{
-		SubmissionTicket subTicket = constants.submit(sub); 
-		if(subTicket.win!=null) contestRepo.save(constants.activeContest);
+		SubmissionTicket subTicket = constants.submit(sub);
+		sub.member.setPost_count(sub.member.getPost_count()-1);
+		
+		memRepo.save(sub.member);
+		
+		contestRepo.save(constants.activeContest);
 		return ResponseEntity
 	            .status(HttpStatus.ACCEPTED)                 
 	            .body(subTicket);
