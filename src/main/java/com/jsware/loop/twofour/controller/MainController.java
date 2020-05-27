@@ -92,6 +92,7 @@ public class MainController {
 						memRepo.saveAll(members);
 						
 						contestRepo.save(constants.activeContest);
+						constants.refresh();
 						
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
@@ -236,15 +237,37 @@ public class MainController {
 	@ResponseBody
 	public ResponseEntity<SubmissionTicket> submit(@RequestBody Submission sub)
 	{
-		SubmissionTicket subTicket = constants.submit(sub);
-		sub.member.setPost_count(sub.member.getPost_count()-1);
+		try {
+			String[] ids = new String[] {sub.member.getUsername(),sub.member.getEmail(),sub.member.getPhone()};
+			
+			Member member = null;
+			
+			for (String id : ids) {
+				
+				if(id !=null) member = memRepo.findByEmailorPhoneNumberorUsername(id);
+				
+				if (member != null) break;
+			}
+			
+			if (member == null || member.getPost_count()<=0) throw new Exception();
+			
+			sub.member = member;
+			
+			SubmissionTicket subTicket = constants.submit(sub);
+			sub.member.setPost_count(sub.member.getPost_count()-1);
+			
+			memRepo.save(sub.member);
+			
+			contestRepo.save(constants.activeContest);
+			return ResponseEntity
+		            .status(HttpStatus.ACCEPTED)                 
+		            .body(subTicket);
+		} catch (Exception e) {
+			return ResponseEntity
+		            .status(HttpStatus.FORBIDDEN)                 
+		            .body(null);
+		}
 		
-		memRepo.save(sub.member);
-		
-		contestRepo.save(constants.activeContest);
-		return ResponseEntity
-	            .status(HttpStatus.ACCEPTED)                 
-	            .body(subTicket);
 	}
 	
 	
