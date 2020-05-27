@@ -5,7 +5,7 @@ public class Submission {
 	public String  description;
 	public Member member;
 	public String content_url;
-	public String content_type;
+	public String content_extension;
 	public int rolls;
 
 }

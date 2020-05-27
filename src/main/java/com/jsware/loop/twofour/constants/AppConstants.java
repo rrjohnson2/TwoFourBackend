@@ -3,6 +3,7 @@ package com.jsware.loop.twofour.constants;
 
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Random;
 
 import org.springframework.stereotype.Component;
@@ -36,22 +37,25 @@ public class AppConstants {
 	
 	public SubmissionTicket submit(Submission sub)
 	{
-		int backupSlot =-1;
+		String backupSlot = null;
 		if(count < backups.length)
 		{
-			backupSlot = count;
+			backupSlot = ("backup"+count + new Date()+sub.content_extension);
+			backupSlot = cleanURL(backupSlot);
 			backups[count] = sub;
 			count++;
 		}
 		
-		boolean winner = false;
+		String winner = null;
 		
 		for (int i = 0; i < sub.rolls; i++) {
 			Random rand = new Random();
 			int factor = rand.nextInt(defaulk); 
 			
 			if(factor == 1 ) {
-				winner= true;
+				winner= ("winner"+ new Date()+sub.content_extension);
+				winner = cleanURL(winner);
+				sub.content_url = winner;
 				activeContest.loadSubmission(sub);
 				break;
 			};
@@ -59,5 +63,13 @@ public class AppConstants {
 		
 		return new SubmissionTicket(winner,backupSlot);
 	}
+	
+	private String  cleanURL(String url) {
+		
+		url = url.replace(" ", "");
+		url = url.replace(":", "");
+		return url;
+	}
+	
 
 }

@@ -5,11 +5,11 @@ package com.jsware.loop.twofour.model;
 public class SubmissionTicket {
 
 	
-	public SubmissionTicket(boolean winner, int backupSlot2) {
+	public SubmissionTicket(String winner, String backupSlot) {
 		this.win = winner;
-		this.backupSlot = backupSlot2;
+		this.backupSlot = backupSlot;
 	}
 
-	public boolean	 win;
-	public int backupSlot =-1;
+	public String	 win;
+	public String backupSlot;
 }

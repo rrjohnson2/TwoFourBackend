@@ -223,9 +223,11 @@ public class MainController {
 	@ResponseBody
 	public ResponseEntity<SubmissionTicket> submit(@RequestBody Submission sub)
 	{
+		SubmissionTicket subTicket = constants.submit(sub); 
+		if(subTicket.win!=null) contestRepo.save(constants.activeContest);
 		return ResponseEntity
 	            .status(HttpStatus.ACCEPTED)                 
-	            .body(constants.submit(sub));
+	            .body(subTicket);
 	}
 	
 	
