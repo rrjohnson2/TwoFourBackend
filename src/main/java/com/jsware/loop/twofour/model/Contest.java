@@ -50,6 +50,11 @@ public class Contest {
 		winner = sub.member;
 		winning_content_url = sub.content_url;
 	}
-	
+	public void nullify()
+	{
+		winning_description = null;
+		winner = null;
+		winning_content_url =null;
+	}
 	
 }

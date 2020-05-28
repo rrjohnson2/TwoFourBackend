@@ -19,7 +19,7 @@ public class AppConstants {
 	
 	public Contest previousContest;
 	
-	private Submission[] backups;
+	public Submission[] backups;
 	
 	private int defaulk =10;
 	private int count;
@@ -43,7 +43,8 @@ public class AppConstants {
 		{
 			backupSlot = ("backup"+count + new Date()+sub.content_extension);
 			backupSlot = cleanURL(backupSlot);
-			backups[count] = sub;
+			backups[count] = new Submission(sub);
+			backups[count].content_url= backupSlot;
 			count++;
 		}
 		
@@ -51,7 +52,7 @@ public class AppConstants {
 		
 		for (int i = 0; i < sub.rolls; i++) {
 			Random rand = new Random();
-			int factor = rand.nextInt(defaulk); 
+			int factor = 1; 
 			
 			if(factor == 1 ) {
 				winner= ("winner"+ new Date()+sub.content_extension);

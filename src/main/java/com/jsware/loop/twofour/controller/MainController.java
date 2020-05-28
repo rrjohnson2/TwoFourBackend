@@ -1,10 +1,15 @@
 package com.jsware.loop.twofour.controller;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 
+import org.apache.http.client.ClientProtocolException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +17,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -25,6 +31,9 @@ import com.jsware.loop.twofour.model.SubmissionTicket;
 import com.jsware.loop.twofour.model.Ticket;
 import com.jsware.loop.twofour.repo.ContestRepo;
 import com.jsware.loop.twofour.repo.MemberRepo;
+import com.jsware.loop.twofour.sending.Email;
+import com.jsware.loop.twofour.sending.EmailandPhoneMessage;
+import com.jsware.loop.twofour.sending.Text;
 
 
 
@@ -33,12 +42,18 @@ public class MainController {
 	
 	@Autowired
 	private MemberRepo memRepo;
+	@Autowired
+	private EmailandPhoneMessage emailPhone;
 	
 	
 	private ContestRepo contestRepo;
 	private AppConstants constants;
 	private VerifyMemberHelper verify;
 	private ObjectMapper mapper;
+	private final Lock lock = new ReentrantLock();
+	private boolean winnerChoosen=false;
+	private final String url ="http://localhost:4200/";
+	private final String annouce="Ccheckout the new winner " + url;
 	
 	
 	@Autowired
@@ -73,19 +88,34 @@ public class MainController {
 					
 					try {
 						Thread.sleep(constants.activeContest.calendar.getTimeInMillis() - now.getTimeInMillis());
-						if(constants.activeContest.winner !=null) /** choose winner**/;
 						
-						constants.previousContest = constants.activeContest;
-						
-						constants.activeContest= new Contest();
+						reloadContestChooseWinner();
 						
 						Iterable<Member> members = memRepo.findAll();
 						members.forEach(new Consumer<Member>() {
 
 							@Override
 							public void accept(Member member) {
-								member.setPost_count(1);
-								
+								try {
+									member.setPost_count(1);
+									if(member.isNotify()) {
+										switch (member.getMessageMedium()) {
+										case PHONE:
+											annouceWinnerText(member);
+											break;
+										case EMAIL:
+											annouceWinnerEmail(member);
+											break;
+										case BOTH:
+											annouceWinnerText(member);
+											annouceWinnerEmail(member);
+											break;
+										}
+									}
+									
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
 							}
 							
 						});
@@ -94,7 +124,8 @@ public class MainController {
 						contestRepo.save(constants.activeContest);
 						constants.refresh();
 						
-					} catch (InterruptedException e) {
+						
+					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
@@ -219,25 +250,55 @@ public class MainController {
 	@ResponseBody
 	public ResponseEntity<Contest> getContest()
 	{
-		return ResponseEntity
-	            .status(HttpStatus.ACCEPTED)                 
-	            .body(constants.activeContest);
+		try {
+			tryLock();
+			return ResponseEntity
+		            .status(HttpStatus.ACCEPTED)                 
+		            .body(constants.activeContest);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+			return ResponseEntity
+		            .status(HttpStatus.INTERNAL_SERVER_ERROR)                 
+		            .body(null);
+		}
+	}
+
+	private void tryLock() throws InterruptedException {
+		while(!lock.tryLock()) {
+			Thread.sleep(1000 * 5);
+		};
+		
+		lock.unlock();
 	}
 	
 	@RequestMapping(value="/getPreviousContest",method=RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<Contest> getPreviousContest()
 	{
-		return ResponseEntity
-	            .status(HttpStatus.ACCEPTED)                 
-	            .body(constants.previousContest);
+		try {
+			tryLock();
+			return ResponseEntity
+		            .status(HttpStatus.ACCEPTED)                 
+		            .body(constants.previousContest);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+			return ResponseEntity
+		            .status(HttpStatus.INTERNAL_SERVER_ERROR)                 
+		            .body(null);
+		}
 	}
 	
 	@RequestMapping(value="/submit",method=RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<SubmissionTicket> submit(@RequestBody Submission sub)
 	{
+		
 		try {
+			
 			String[] ids = new String[] {sub.member.getUsername(),sub.member.getEmail(),sub.member.getPhone()};
 			
 			Member member = null;
@@ -267,7 +328,56 @@ public class MainController {
 		            .status(HttpStatus.FORBIDDEN)                 
 		            .body(null);
 		}
+	}
+	
+	@RequestMapping(value="/chooseWinner",method=RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<Object> chooseWinner(@RequestParam int choice)
+	{
+		try {
+			if(choice >= 0) {
+				if(constants.backups[choice] != null)constants.activeContest.loadSubmission(constants.backups[choice]);
+				else constants.activeContest.nullify();
+			}
+			winnerChoosen  = true;
+			return ResponseEntity
+		            .status(HttpStatus.ACCEPTED)                 
+		            .body(null);
+			
+		}catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity
+		            .status(HttpStatus.FORBIDDEN)                 
+		            .body(null);
+		}
+	}
+
+	private void reloadContestChooseWinner() throws InterruptedException, IllegalAccessException, ClientProtocolException, IOException {
 		
+//		emailPhone.sendText(new Text("choose a winner","3366181285"));
+		while(!winnerChoosen) {
+			lock.lock();
+			Thread.sleep(1000 *10);
+		}
+		lock.unlock();
+		
+		
+		constants.previousContest = constants.activeContest;
+		
+		constants.activeContest= new Contest();
+		winnerChoosen =false;
+		
+		
+		
+	}
+
+	private void annouceWinnerEmail(Member member) throws IllegalAccessException, ClientProtocolException, IOException {
+		emailPhone.sendEmail(new Email("looooop.inc@gmail.com",
+				member.getEmail(), "NEW WINNER", annouce, "johnsr41"));
+	}
+
+	private void annouceWinnerText(Member member) throws IllegalAccessException, ClientProtocolException, IOException {
+		emailPhone.sendText(new Text(annouce,member.getPhone()));
 	}
 	
 	
