@@ -42,8 +42,7 @@ public class MainController {
 	
 	@Autowired
 	private MemberRepo memRepo;
-	@Autowired
-	private EmailandPhoneMessage emailPhone;
+	
 	
 	
 	private ContestRepo contestRepo;
@@ -52,8 +51,7 @@ public class MainController {
 	private ObjectMapper mapper;
 	private final Lock lock = new ReentrantLock();
 	private boolean winnerChoosen=false;
-	private final String url ="http://localhost:4200/";
-	private final String annouce="Ccheckout the new winner " + url;
+	
 	
 	
 	@Autowired
@@ -355,11 +353,14 @@ public class MainController {
 	private void reloadContestChooseWinner() throws InterruptedException, IllegalAccessException, ClientProtocolException, IOException {
 		
 //		emailPhone.sendText(new Text("choose a winner","3366181285"));
+		boolean youLocked= false;
 		while(!winnerChoosen) {
 			lock.lock();
 			Thread.sleep(1000 *10);
+			youLocked= true;
+			
 		}
-		lock.unlock();
+		if(youLocked) lock.unlock();
 		
 		
 		constants.previousContest = constants.activeContest;
@@ -372,12 +373,11 @@ public class MainController {
 	}
 
 	private void annouceWinnerEmail(Member member) throws IllegalAccessException, ClientProtocolException, IOException {
-		emailPhone.sendEmail(new Email("looooop.inc@gmail.com",
-				member.getEmail(), "NEW WINNER", annouce, "johnsr41"));
+		verify.announceEmail(member);
 	}
 
 	private void annouceWinnerText(Member member) throws IllegalAccessException, ClientProtocolException, IOException {
-		emailPhone.sendText(new Text(annouce,member.getPhone()));
+		verify.announceText(member);
 	}
 	
 	
