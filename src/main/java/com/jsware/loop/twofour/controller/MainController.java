@@ -113,6 +113,7 @@ public class MainController {
 									
 								} catch (Exception e) {
 									e.printStackTrace();
+									Thread.currentThread().interrupt();
 								}
 							}
 							
@@ -264,9 +265,7 @@ public class MainController {
 	}
 
 	private void tryLock() throws InterruptedException {
-		while(!lock.tryLock()) {
-			Thread.sleep(1000 * 5);
-		};
+		lock.lock();
 		
 		lock.unlock();
 	}
@@ -360,7 +359,10 @@ public class MainController {
 			youLocked= true;
 			
 		}
-		if(youLocked) lock.unlock();
+		if(youLocked) {
+			lock.unlock();
+			
+		};
 		
 		
 		constants.previousContest = constants.activeContest;
