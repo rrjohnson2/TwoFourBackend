@@ -38,7 +38,7 @@ public class Contest {
 	public Contest() {
 		Date today = new Date();
 		calendar.setTime(new Date());
-		calendar.add(Calendar.SECOND, 45);
+		calendar.add(Calendar.DATE, 1);
 		sub_count = 0;
 	}
 	

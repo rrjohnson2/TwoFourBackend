@@ -61,7 +61,23 @@ public class MainController {
 		
 		this.mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 		
-		constants.previousContest= contestRepo.findLastest();
+		new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(5 * 1000);
+					init(constants, contestRepo);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}).start();
+	}
+
+	private void init(AppConstants constants, ContestRepo contestRepo) {
+		constants.previousContest= contestRepo.findTopByOrderByCalendar();
 		constants.activeContest = new Contest() ;
 		contestRepo.save(constants.activeContest);
 		
