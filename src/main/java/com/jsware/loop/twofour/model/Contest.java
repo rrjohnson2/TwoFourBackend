@@ -31,6 +31,8 @@ public class Contest {
 	
 	public String winning_content_url;
 	
+	public String winning_content_type;
+	
 	
 	@SuppressWarnings("deprecation")
 	public Contest() {
@@ -45,12 +47,14 @@ public class Contest {
 		winning_description = sub.description;
 		winner = sub.member;
 		winning_content_url = sub.content_url;
+		winning_content_type =  sub.content_type;
 	}
 	public void nullify()
 	{
 		winning_description = null;
 		winner = null;
 		winning_content_url =null;
+		winning_content_type = null;
 	}
 	
 }

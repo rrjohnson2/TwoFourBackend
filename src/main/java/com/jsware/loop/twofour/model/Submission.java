@@ -14,6 +14,7 @@ public class Submission {
 	public Member member;
 	public String content_url;
 	public String content_extension;
+	public String content_type;
 	public int rolls;
 
 }
