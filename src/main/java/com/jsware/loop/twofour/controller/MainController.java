@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
@@ -31,9 +30,6 @@ import com.jsware.loop.twofour.model.SubmissionTicket;
 import com.jsware.loop.twofour.model.Ticket;
 import com.jsware.loop.twofour.repo.ContestRepo;
 import com.jsware.loop.twofour.repo.MemberRepo;
-import com.jsware.loop.twofour.sending.Email;
-import com.jsware.loop.twofour.sending.EmailandPhoneMessage;
-import com.jsware.loop.twofour.sending.Text;
 
 
 
@@ -119,13 +115,11 @@ public class MainController {
 							
 						});
 						memRepo.saveAll(members);
-						
 						contestRepo.save(constants.activeContest);
 						constants.refresh();
 						
 						
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
@@ -280,7 +274,6 @@ public class MainController {
 		            .status(HttpStatus.ACCEPTED)                 
 		            .body(constants.previousContest);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 
 			return ResponseEntity
@@ -351,12 +344,15 @@ public class MainController {
 
 	private void reloadContestChooseWinner() throws InterruptedException, IllegalAccessException, ClientProtocolException, IOException {
 		
-//		emailPhone.sendText(new Text("choose a winner","3366181285"));
+		verify.alertAdmin();;
 		boolean youLocked= false;
 		while(!winnerChoosen) {
-			lock.lock();
+			if(!youLocked) {
+				lock.lock();
+				youLocked= true;
+			}
 			Thread.sleep(1000 *10);
-			youLocked= true;
+			
 			
 		}
 		if(youLocked) {
@@ -366,7 +362,6 @@ public class MainController {
 		
 		
 		constants.previousContest = constants.activeContest;
-		
 		constants.activeContest= new Contest();
 		winnerChoosen =false;
 		

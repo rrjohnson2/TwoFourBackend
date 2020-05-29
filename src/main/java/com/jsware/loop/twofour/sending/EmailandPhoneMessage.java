@@ -16,7 +16,7 @@ import org.apache.http.entity.StringEntity;
 @Component
 public class EmailandPhoneMessage {
 	
-	private final  CloseableHttpClient http_client = HttpClients.createDefault();
+	
 	private final String sms_server = "http://localhost:8081/";
 	
 	
@@ -30,6 +30,7 @@ public class EmailandPhoneMessage {
 	}
 	private void send(String path, Object obj) throws IllegalAccessException, ClientProtocolException, IOException
 	{
+		CloseableHttpClient http_client = HttpClients.createDefault();
 		HttpPost post = new HttpPost(sms_server +path);
 		
 	    post.setEntity(new StringEntity(stripTojsonField(obj)));
@@ -37,6 +38,7 @@ public class EmailandPhoneMessage {
 	    post.setHeader("Content-type", "application/json");
 	    
 	    http_client.execute(post);
+	    http_client.close();
 	}
 
 	private String stripTojsonField(Object obj) throws IllegalAccessException {

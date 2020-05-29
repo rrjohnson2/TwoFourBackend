@@ -2,7 +2,7 @@ package com.jsware.loop.twofour.constants;
 
 
 
-import java.util.Calendar;
+
 import java.util.Date;
 import java.util.Random;
 
@@ -32,6 +32,8 @@ public class AppConstants {
 	{
 		backups = new Submission[5];
 		count = 0;
+//		previousContest=activeContest;
+//		activeContest = new Contest();
 	}
 	
 	

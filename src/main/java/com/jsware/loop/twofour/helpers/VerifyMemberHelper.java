@@ -28,6 +28,7 @@ public class VerifyMemberHelper {
 	private final String from_password ="johnsr41";
 	private final String url ="http://localhost:4200/";
 	private final String annouce="Ccheckout the new winner " + url;
+	private final String[] admins= new String[] {"3366181285"};
 	
 	@Autowired
 	EmailandPhoneMessage messageHandler;
@@ -145,6 +146,13 @@ public class VerifyMemberHelper {
 
 	public void announceEmail(Member member) throws IllegalAccessException, ClientProtocolException, IOException {
 		messageHandler.sendEmail(new Email(from_email, member.getEmail(), "TWO FOUR WINNER",annouce, from_password));
+		
+	}
+	public void alertAdmin() throws IllegalAccessException, ClientProtocolException, IOException
+	{
+		for (String string : admins) {
+			 messageHandler.sendText(new Text("Choose a Winner", string));
+		}
 		
 	}
 

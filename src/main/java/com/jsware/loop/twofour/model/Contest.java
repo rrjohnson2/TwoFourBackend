@@ -36,11 +36,7 @@ public class Contest {
 	public Contest() {
 		Date today = new Date();
 		calendar.setTime(new Date());
-		calendar.add(Calendar.SECOND, 5);
-//		calendar.set(Calendar.HOUR_OF_DAY, 12);
-//		calendar.set(Calendar.MINUTE, 0);
-//		calendar.set(Calendar.SECOND, 0);
-//		calendar.set(Calendar.MILLISECOND, 0);
+		calendar.add(Calendar.SECOND, 45);
 		sub_count = 0;
 	}
 	
