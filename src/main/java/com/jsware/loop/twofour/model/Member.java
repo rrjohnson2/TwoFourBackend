@@ -16,47 +16,46 @@ import javax.persistence.SequenceGenerator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-@SequenceGenerator(name="mem_seq", initialValue=1)
+@SequenceGenerator(name = "mem_seq", initialValue = 1)
 public class Member {
-	
+
 	@Id
 	@JsonIgnore
-	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="mem_seq")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mem_seq")
 	private long id;
-	
-	@Column( unique = true ,length=15)
+
+	@Column(unique = true, length = 15)
 	private String username;
-	
-	@Column( unique = true ,length=30)
+
+	@Column(unique = true, length = 30)
 	private String email;
-	
-	@Column( unique = true ,length=15)
+
+	@Column(unique = true, length = 15)
 	private String phone;
-	
+
 	@JsonIgnore
 	private String salt;
-	
+
 	@JsonIgnore
 	private String saltyPassword;
-	
-	
+
 	private boolean verified;
-	
+
 	private boolean newsletter;
-	
+
 	@Enumerated(EnumType.STRING)
 	private MessageMedium messageMedium;
-	
+
 	private boolean notify;
-	
-	private  int post_count;
-	
+
+	private int post_count;
+
 	private String facebook;
-	
+
 	private String instagram;
-	 
+
 	private String twitter;
-	
+
 	public boolean isVerified() {
 		return verified;
 	}
@@ -169,81 +168,70 @@ public class Member {
 		this.notify = notify;
 	}
 
-	public void setPassword(String password)
-	{
-		Random rand = new  SecureRandom();
-		
+	public void setPassword(String password) {
+		Random rand = new SecureRandom();
+
 		byte[] saltyBytes = new byte[32];
-		
+
 		rand.nextBytes(saltyBytes);
-		
+
 		this.salt = Base64.getEncoder().encodeToString(saltyBytes);
-		
-		this.saltyPassword= salt+encrypt(this.salt,password)+salt;
+
+		this.saltyPassword = salt + encrypt(this.salt, password) + salt;
 	}
-	
+
 	private String encrypt(String salt, String password) {
 		/*
-		 * This encryption method takes the salt and password mixes it up by alternating 
-		 * characters into a result variable salt starts first;
-		 * but if one or the other runs out the the crypt uses the remaining characters of the other list
+		 * This encryption method takes the salt and password mixes it up by alternating
+		 * characters into a result variable salt starts first; but if one or the other
+		 * runs out the the crypt uses the remaining characters of the other list
 		 */
-		char[] res = new char[salt.length()+password.length()];
-		
+		char[] res = new char[salt.length() + password.length()];
+
 		char[] salt_char = salt.toCharArray();
 		char[] password_char = password.toCharArray();
-		
-		int salt_count=0;
+
+		int salt_count = 0;
 		int salt_max = salt.length();
-		int password_count =0;
+		int password_count = 0;
 		int password_max = password.length();
-		
-		for(int i = 0; i<res.length;i++)
-		{
-			if(i%2==0)
-			{
-				if(salt_count<salt_max)
-				{
-					res[i]=salt_char[salt_count];
+
+		for (int i = 0; i < res.length; i++) {
+			if (i % 2 == 0) {
+				if (salt_count < salt_max) {
+					res[i] = salt_char[salt_count];
 					salt_count++;
-				}
-				else {
-					populateRemaining(i,password_char,password_count,res);
+				} else {
+					populateRemaining(i, password_char, password_count, res);
 					break;
 				}
 			}
-			
-			else
-			{
-				if(password_count<password_max)
-					{
-						
-						res[i]= password_char[password_count];
-						password_count++;
-					}
-				else {
-					populateRemaining(i,salt_char,salt_count,res);
+
+			else {
+				if (password_count < password_max) {
+
+					res[i] = password_char[password_count];
+					password_count++;
+				} else {
+					populateRemaining(i, salt_char, salt_count, res);
 					break;
-					}
-				
+				}
+
 			}
 		}
-			
+
 		return new String(res);
 	}
-	
+
 	private void populateRemaining(int current, char[] _char, int _count, char[] res) {
-		for(int i= current;i<res.length;i++)
-		{
-			res[i]=_char[_count];
+		for (int i = current; i < res.length; i++) {
+			res[i] = _char[_count];
 			_count++;
 		}
 	}
 
-
-	public boolean AccessGranted(String password)
-	{
-		return saltyPassword.equals(salt+encrypt(salt,password)+salt);
+	public boolean AccessGranted(String password) {
+		return saltyPassword.equals(salt + encrypt(salt, password) + salt);
 	}
 
 	@Override
@@ -282,7 +270,20 @@ public class Member {
 			return false;
 		return true;
 	}
-	
-	
+
+	public void lodaMember(Member m) {
+		this.username = m.username;
+		this.email = m.email;
+		this.phone = m.phone;
+		this.newsletter = m.newsletter;
+		this.messageMedium = m.messageMedium;
+		this.facebook = m.facebook;
+		this.instagram = m.instagram;
+		this.twitter = m.twitter;
+	}
+
+	public Member() {
+		super();
+	}
 
 }

@@ -321,6 +321,25 @@ public class MainController {
 		}
 	}
 
+	@RequestMapping(value = "/update", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<Object> update(@RequestBody Ticket ticket) {
+		try {
+
+			Member mem = memRepo.findByEmailorPhoneNumberorUsername(ticket.getId());
+
+			mem.lodaMember(mapper.readValue(mapper.writeValueAsString(ticket.getData()), Member.class));
+
+			memRepo.save(mem);
+
+			return ResponseEntity.status(HttpStatus.ACCEPTED).body(null);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+		}
+	}
+
 	private void reloadContestChooseWinner()
 			throws InterruptedException, IllegalAccessException, ClientProtocolException, IOException {
 
