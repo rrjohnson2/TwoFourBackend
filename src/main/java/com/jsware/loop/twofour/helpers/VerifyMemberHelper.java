@@ -27,7 +27,7 @@ public class VerifyMemberHelper {
 	private final String from_email = "looooop.inc@gmail.com";
 	private final String from_password = "johnsr41";
 	private final String url = "http://twofourpicture-env.eba-avytpez6.us-east-2.elasticbeanstalk.com/";
-	private final String annouce = "Checkout the new winner " + url;
+	private final String annouce = "Checkout the new Winner " + url;
 	private final String[] admins = new String[] { "3366181285" };
 
 	@Autowired
