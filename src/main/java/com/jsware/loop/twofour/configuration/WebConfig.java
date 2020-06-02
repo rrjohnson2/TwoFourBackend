@@ -8,16 +8,14 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
-	
+
 	private static final Logger log = LoggerFactory.getLogger(WebConfig.class);
 
 	@Override
-	public void addCorsMappings(CorsRegistry reg)
-	{
-		reg.addMapping("/**")
-			//.allowedOrigins("**")
-			.allowedMethods("POST","GET");
-		
+	public void addCorsMappings(CorsRegistry reg) {
+		reg.addMapping("/**").allowedOrigins("http://twofourviral-env-1.eba-p9mz54re.us-east-2.elasticbeanstalk.com/")
+				.allowedMethods("POST", "GET");
+
 		log.info("Mapping Init");
 	}
 
