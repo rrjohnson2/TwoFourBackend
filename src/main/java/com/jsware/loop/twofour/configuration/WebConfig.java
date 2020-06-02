@@ -13,7 +13,7 @@ public class WebConfig implements WebMvcConfigurer {
 
 	@Override
 	public void addCorsMappings(CorsRegistry reg) {
-		reg.addMapping("/**").allowedOrigins("http://twofourviral-env-1.eba-p9mz54re.us-east-2.elasticbeanstalk.com/")
+		reg.addMapping("/**")// .allowedOrigins("http://twofourviral-env-1.eba-p9mz54re.us-east-2.elasticbeanstalk.com/")
 				.allowedMethods("POST", "GET");
 
 		log.info("Mapping Init");
