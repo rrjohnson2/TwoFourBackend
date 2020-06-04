@@ -1,9 +1,12 @@
 package com.jsware.loop.twofour.model;
 
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 import java.util.Random;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -11,6 +14,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -57,6 +61,14 @@ public class Member {
 	private String twitter;
 
 	private String role = "user";
+
+	@JsonIgnore
+	@OneToMany(mappedBy = "winner", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Contest> contest = new ArrayList<Contest>();
+
+	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonIgnore
+	private List<Submission> submissions = new ArrayList<Submission>();
 
 	public boolean isVerified() {
 		return verified;
@@ -294,6 +306,14 @@ public class Member {
 
 	public Member() {
 		super();
+	}
+
+	public List<Submission> getSubmissions() {
+		return submissions;
+	}
+
+	public void setSubmissions(List<Submission> submissions) {
+		this.submissions = submissions;
 	}
 
 }

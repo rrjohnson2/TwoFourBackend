@@ -1,8 +1,5 @@
 package com.jsware.loop.twofour.constants;
 
-
-
-
 import java.util.Date;
 import java.util.Random;
 
@@ -16,64 +13,59 @@ import com.jsware.loop.twofour.model.SubmissionTicket;
 public class AppConstants {
 
 	public Contest activeContest;
-	
+
 	public Contest previousContest;
-	
-	public Submission[] backups;
-	
-	private int defaulk =10;
+
+	private int defaulk = 10;
 	private int count;
-	
+
 	public AppConstants() {
 		refresh();
 	}
-	
-	public void refresh()
-	{
-		backups = new Submission[5];
+
+	public void refresh() {
 		count = 0;
-//		previousContest=activeContest;
-//		activeContest = new Contest();
 	}
-	
-	
-	public SubmissionTicket submit(Submission sub)
-	{
+
+	public SubmissionTicket submit(Submission sub) {
 		activeContest.sub_count++;
 		String backupSlot = null;
-		if(count < backups.length)
-		{
-			backupSlot = ("backup"+count + new Date()+sub.content_extension);
+		if (count < 5) {
+			backupSlot = ("backup" + count + new Date() + sub.content_extension);
 			backupSlot = cleanURL(backupSlot);
-			backups[count] = new Submission(sub);
-			backups[count].content_url= backupSlot;
+
+			sub.content_url = backupSlot;
+			sub.contest = activeContest;
+
+			activeContest.backups.add(sub);
+			sub.member.getSubmissions().add(sub);
+
 			count++;
 		}
-		
+
 		String winner = null;
-		
+
 		for (int i = 0; i < sub.rolls; i++) {
-			Random rand = new Random();
-			int factor = 1; 
-			
-			if(factor == 1 ) {
-				winner= ("winner"+ new Date()+sub.content_extension);
+			int factor = new Random().nextInt(defaulk);
+
+			if (factor == 1) {
+				winner = ("winner" + new Date() + sub.content_extension);
 				winner = cleanURL(winner);
 				sub.content_url = winner;
 				activeContest.loadSubmission(sub);
 				break;
-			};
+			}
+
 		}
-		
-		return new SubmissionTicket(winner,backupSlot);
+
+		return new SubmissionTicket(winner, backupSlot);
 	}
-	
-	private String  cleanURL(String url) {
-		
+
+	private String cleanURL(String url) {
+
 		url = url.replace(" ", "");
 		url = url.replace(":", "");
 		return url;
 	}
-	
 
 }

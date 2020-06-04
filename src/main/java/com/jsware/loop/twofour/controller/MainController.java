@@ -30,6 +30,7 @@ import com.jsware.loop.twofour.model.SubmissionTicket;
 import com.jsware.loop.twofour.model.Ticket;
 import com.jsware.loop.twofour.repo.ContestRepo;
 import com.jsware.loop.twofour.repo.MemberRepo;
+import com.jsware.loop.twofour.repo.SubmissionRepo;
 
 @Controller
 public class MainController {
@@ -37,7 +38,11 @@ public class MainController {
 	@Autowired
 	private MemberRepo memRepo;
 
+	@Autowired
+	private SubmissionRepo subRepo;
+
 	private ContestRepo contestRepo;
+
 	private AppConstants constants;
 	private VerifyMemberHelper verify;
 	private ObjectMapper mapper;
@@ -264,9 +269,14 @@ public class MainController {
 			SubmissionTicket subTicket = constants.submit(sub);
 			sub.member.setPost_count(sub.member.getPost_count() - 1);
 
+			if (subTicket.backupSlot != null) {
+				subRepo.save(sub);
+			}
+
 			memRepo.save(sub.member);
 
 			contestRepo.save(constants.activeContest);
+
 			return ResponseEntity.status(HttpStatus.ACCEPTED).body(subTicket);
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
@@ -278,8 +288,8 @@ public class MainController {
 	public ResponseEntity<Object> chooseWinner(@RequestParam int choice) {
 		try {
 			if (choice >= 0) {
-				if (constants.backups[choice] != null)
-					constants.activeContest.loadSubmission(constants.backups[choice]);
+				if (!constants.activeContest.backups.isEmpty())
+					constants.activeContest.loadSubmission(constants.activeContest.backups.get(choice));
 				else
 					constants.activeContest.nullify();
 			}
