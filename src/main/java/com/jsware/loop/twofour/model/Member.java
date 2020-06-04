@@ -56,6 +56,8 @@ public class Member {
 
 	private String twitter;
 
+	private String role = "user";
+
 	public boolean isVerified() {
 		return verified;
 	}
@@ -158,6 +160,14 @@ public class Member {
 
 	public void setMessageMedium(MessageMedium messageMedium) {
 		this.messageMedium = messageMedium;
+	}
+
+	public String getRole() {
+		return role;
+	}
+
+	public void setRole(String role) {
+		this.role = role;
 	}
 
 	public boolean isNotify() {
