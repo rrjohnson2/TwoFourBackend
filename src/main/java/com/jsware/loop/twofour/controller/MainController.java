@@ -16,7 +16,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -261,7 +260,7 @@ public class MainController {
 					break;
 			}
 
-			if (member == null || member.getPost_count() <= 0)
+			if (member == null || member.getPost_count() <= Double.NEGATIVE_INFINITY)
 				throw new Exception();
 
 			sub.member = member;
@@ -285,11 +284,11 @@ public class MainController {
 
 	@RequestMapping(value = "/chooseWinner", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<Object> chooseWinner(@RequestParam int choice) {
+	public ResponseEntity<Object> chooseWinner(@RequestBody long choice) {
 		try {
 			if (choice >= 0) {
 				if (!constants.activeContest.backups.isEmpty())
-					constants.activeContest.loadSubmission(constants.activeContest.backups.get(choice));
+					constants.activeContest.loadSubmission(subRepo.findById(choice).get());
 				else
 					constants.activeContest.nullify();
 			}

@@ -23,7 +23,7 @@ public class Submission {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mem_seq")
-	public int id;
+	public long id;
 
 	public Submission() {
 	}
