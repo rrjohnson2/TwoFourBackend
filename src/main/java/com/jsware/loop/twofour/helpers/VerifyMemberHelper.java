@@ -94,7 +94,7 @@ public class VerifyMemberHelper {
 			@Override
 			public void run() {
 				try {
-					Thread.sleep(3 * 60 * 1000);
+					Thread.sleep(5 * 60 * 1000);
 					removeMember(code, mem);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
