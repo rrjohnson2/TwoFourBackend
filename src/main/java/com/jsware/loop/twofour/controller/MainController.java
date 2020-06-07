@@ -275,7 +275,7 @@ public class MainController {
 					break;
 			}
 
-			if (member == null || member.getPost_count() <= Double.NEGATIVE_INFINITY)
+			if (member == null || member.getPost_count() <= 0)
 				throw new Exception();
 
 			sub.member = member;
