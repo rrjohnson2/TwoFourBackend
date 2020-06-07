@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
@@ -214,6 +215,20 @@ public class MainController {
 		try {
 			tryLock();
 			return ResponseEntity.status(HttpStatus.ACCEPTED).body(constants.activeContest);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+		}
+	}
+
+	@RequestMapping(value = "/getBackups", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<Submission>> getBackups() {
+		try {
+			tryLock();
+			return ResponseEntity.status(HttpStatus.ACCEPTED).body(constants.activeContest.backups);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

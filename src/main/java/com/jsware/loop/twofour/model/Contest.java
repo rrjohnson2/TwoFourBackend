@@ -29,6 +29,7 @@ public class Contest {
 	public Member winner;
 
 	@OneToMany(mappedBy = "contest", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonIgnore
 	public List<Submission> backups = new ArrayList<Submission>();
 
 	public Calendar calendar = Calendar.getInstance();
