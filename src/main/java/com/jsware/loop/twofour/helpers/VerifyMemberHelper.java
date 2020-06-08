@@ -25,7 +25,7 @@ public class VerifyMemberHelper {
 	public HashMap<Integer, Integer> index_to_code = new HashMap<Integer, Integer>();
 
 	private final String from_email = "looooop.inc@gmail.com";
-	private final String from_password = "johnsr41";
+	private final String from_password = "Johnsr4111";
 	private final String url = "http://www.blumorel.com/";
 	private final String annouce = "Checkout the new Winner " + url;
 	private final String[] admins = new String[] { "3366181285" };
