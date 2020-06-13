@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class EmailandPhoneMessage {
 
-	private final String sms_server = "https://loopsmsemail.com/";
+	private final String sms_server = "https://loopsmsemail.net/";
 
 	public void sendEmail(Email em) throws IllegalAccessException, ClientProtocolException, IOException {
 		send("sendEmail", em);
