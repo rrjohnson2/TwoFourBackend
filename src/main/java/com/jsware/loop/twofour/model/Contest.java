@@ -32,13 +32,13 @@ public class Contest {
 	private Calendar calendar = Calendar.getInstance();
 	public int sub_count = 0;
 
-	public int winning_index;
+	public int winning_index = -1;
 
 	@SuppressWarnings("deprecation")
 	public Contest() {
 		Date today = new Date();
 		calendar.setTime(new Date());
-		calendar.add(Calendar.MINUTE, 1);
+		calendar.add(Calendar.DATE, 1);
 		sub_count = 0;
 	}
 

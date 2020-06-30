@@ -238,8 +238,7 @@ public class MainController {
 	}
 
 	private Submission getWinner(Contest con) {
-		// TODO Auto-generated method stub
-		if (con.sub_count == 0)
+		if (con.sub_count == 0 || con.winning_index == -1)
 			return null;
 		else
 			return con.getSubs().get(con.winning_index);
@@ -304,19 +303,25 @@ public class MainController {
 		lock.unlock();
 	}
 
-	@RequestMapping(value = "/approveWinner", method = RequestMethod.POST)
+	@RequestMapping(value = "/approveWinner", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<Object> chooseWinner(@RequestBody boolean choice) {
+	public ResponseEntity<Object> chooseWinner() {
 		try {
-			if (!choice) {
-				if (!constants.activeContest.getSubs().isEmpty())
-					pickWinner();
-				else
-					constants.activeContest.nullify();
-			} else {
-				winnerChoosen = true;
-			}
+			winnerChoosen = true;
 			return ResponseEntity.status(HttpStatus.ACCEPTED).body(constants.activeContest);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+		}
+	}
+
+	@RequestMapping(value = "/forceWinner", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<Object> forceWinner() {
+		try {
+			pickWinner();
+			return ResponseEntity.status(HttpStatus.ACCEPTED).body(getWinner(constants.activeContest));
 
 		} catch (Exception e) {
 			e.printStackTrace();
