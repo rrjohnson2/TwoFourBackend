@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Random;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
@@ -26,7 +26,6 @@ import com.jsware.loop.twofour.helpers.VerifyMemberHelper;
 import com.jsware.loop.twofour.model.Contest;
 import com.jsware.loop.twofour.model.Member;
 import com.jsware.loop.twofour.model.Submission;
-import com.jsware.loop.twofour.model.SubmissionTicket;
 import com.jsware.loop.twofour.model.Ticket;
 import com.jsware.loop.twofour.repo.ContestRepo;
 import com.jsware.loop.twofour.repo.MemberRepo;
@@ -95,7 +94,9 @@ public class MainController {
 					now.setTime(new Date());
 
 					try {
-						Thread.sleep(constants.activeContest.calendar.getTimeInMillis() - now.getTimeInMillis());
+						Thread.sleep(constants.activeContest.getCalendar().getTimeInMillis() - now.getTimeInMillis());
+
+						lock.lock();
 
 						reloadContestChooseWinner();
 
@@ -130,7 +131,8 @@ public class MainController {
 						});
 						memRepo.saveAll(members);
 						contestRepo.save(constants.activeContest);
-						constants.refresh();
+
+						lock.unlock();
 
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -213,7 +215,6 @@ public class MainController {
 	@ResponseBody
 	public ResponseEntity<Contest> getContest() {
 		try {
-			tryLock();
 			return ResponseEntity.status(HttpStatus.ACCEPTED).body(constants.activeContest);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -223,12 +224,11 @@ public class MainController {
 		}
 	}
 
-	@RequestMapping(value = "/getBackups", method = RequestMethod.GET)
+	@RequestMapping(value = "/getWinner", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<Submission>> getBackups() {
+	public ResponseEntity<Submission> getWinner() {
 		try {
-			tryLock();
-			return ResponseEntity.status(HttpStatus.ACCEPTED).body(constants.activeContest.backups);
+			return ResponseEntity.status(HttpStatus.ACCEPTED).body(getWinner(constants.activeContest));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -237,18 +237,19 @@ public class MainController {
 		}
 	}
 
-	private void tryLock() throws InterruptedException {
-		lock.lock();
-
-		lock.unlock();
+	private Submission getWinner(Contest con) {
+		// TODO Auto-generated method stub
+		if (con.sub_count == 0)
+			return null;
+		else
+			return con.getSubs().get(con.winning_index);
 	}
 
-	@RequestMapping(value = "/getPreviousContest", method = RequestMethod.GET)
+	@RequestMapping(value = "/getPreviousWinner", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<Contest> getPreviousContest() {
+	public ResponseEntity<Submission> getPreviousWinner() {
 		try {
-			tryLock();
-			return ResponseEntity.status(HttpStatus.ACCEPTED).body(constants.previousContest);
+			return ResponseEntity.status(HttpStatus.ACCEPTED).body(getWinner(constants.previousContest));
 		} catch (Exception e) {
 			e.printStackTrace();
 
@@ -258,10 +259,11 @@ public class MainController {
 
 	@RequestMapping(value = "/submit", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<SubmissionTicket> submit(@RequestBody Submission sub) {
+	public ResponseEntity<Object> submit(@RequestBody Submission sub) {
 
 		try {
 
+			trylock();
 			String[] ids = new String[] { sub.member.getUsername(), sub.member.getEmail(), sub.member.getPhone() };
 
 			Member member = null;
@@ -280,35 +282,41 @@ public class MainController {
 
 			sub.member = member;
 
-			SubmissionTicket subTicket = constants.submit(sub);
+			constants.submit(sub);
 			sub.member.setPost_count(sub.member.getPost_count() - 1);
 
-			if (subTicket.backupSlot != null) {
-				subRepo.save(sub);
-			}
+			sub.content_url = sub.content_type != null ? new Date().getTime() + "" : null;
+
+			subRepo.save(sub);
 
 			memRepo.save(sub.member);
 
 			contestRepo.save(constants.activeContest);
 
-			return ResponseEntity.status(HttpStatus.ACCEPTED).body(subTicket);
+			return ResponseEntity.status(HttpStatus.ACCEPTED).body(sub.content_url);
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
 		}
 	}
 
-	@RequestMapping(value = "/chooseWinner", method = RequestMethod.POST)
+	private void trylock() {
+		lock.lock();
+		lock.unlock();
+	}
+
+	@RequestMapping(value = "/approveWinner", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<Object> chooseWinner(@RequestBody long choice) {
+	public ResponseEntity<Object> chooseWinner(@RequestBody boolean choice) {
 		try {
-			if (choice >= 0) {
-				if (!constants.activeContest.backups.isEmpty())
-					constants.activeContest.loadSubmission(subRepo.findById(choice).get());
+			if (!choice) {
+				if (!constants.activeContest.getSubs().isEmpty())
+					pickWinner();
 				else
 					constants.activeContest.nullify();
+			} else {
+				winnerChoosen = true;
 			}
-			winnerChoosen = true;
-			return ResponseEntity.status(HttpStatus.ACCEPTED).body(null);
+			return ResponseEntity.status(HttpStatus.ACCEPTED).body(constants.activeContest);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -366,23 +374,14 @@ public class MainController {
 
 	private void reloadContestChooseWinner()
 			throws InterruptedException, IllegalAccessException, ClientProtocolException, IOException {
+		if (constants.activeContest.sub_count != 0) {
+			pickWinner();
+			verify.alertAdmin();
+			while (!winnerChoosen) {
+				Thread.sleep(1000 * 10);
 
-		verify.alertAdmin();
-		;
-		boolean youLocked = false;
-		while (!winnerChoosen) {
-			if (!youLocked) {
-				lock.lock();
-				youLocked = true;
 			}
-			Thread.sleep(1000 * 10);
-
 		}
-		if (youLocked) {
-			lock.unlock();
-
-		}
-		;
 
 		constants.previousContest = constants.activeContest;
 		constants.activeContest = new Contest();
@@ -396,6 +395,15 @@ public class MainController {
 
 	private void annouceWinnerText(Member member) throws IllegalAccessException, ClientProtocolException, IOException {
 		verify.announceText(member);
+	}
+
+	private void pickWinner() {
+		if (constants.activeContest.sub_count == 0)
+			return;
+		int rand_number = new Random().nextInt(constants.activeContest.getSubs().size());
+
+		constants.activeContest.winning_index = rand_number;
+
 	}
 
 }

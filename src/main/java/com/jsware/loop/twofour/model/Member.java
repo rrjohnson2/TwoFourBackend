@@ -62,10 +62,6 @@ public class Member {
 
 	private String role = "user";
 
-	@JsonIgnore
-	@OneToMany(mappedBy = "winner", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Contest> contest = new ArrayList<Contest>();
-
 	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
 	@JsonIgnore
 	private List<Submission> submissions = new ArrayList<Submission>();

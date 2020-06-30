@@ -14,11 +14,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public class Submission {
 
 	public Submission(Submission sub) {
-		this.content_extension = sub.content_extension;
 		this.content_url = sub.content_url;
 		this.description = sub.description;
 		this.member = sub.member;
-		this.rolls = sub.rolls;
 	}
 
 	@Id
@@ -37,8 +35,7 @@ public class Submission {
 	@JsonIgnore
 	public Contest contest;
 	public String content_url;
-	public String content_extension;
 	public String content_type;
-	public int rolls;
+	public String content_extension;
 
 }

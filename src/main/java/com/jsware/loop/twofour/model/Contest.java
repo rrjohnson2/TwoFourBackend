@@ -7,10 +7,10 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 
@@ -25,42 +25,49 @@ public class Contest {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "con_seq")
 	private long id;
 
-	@ManyToOne
-	public Member winner;
-
-	@OneToMany(mappedBy = "contest", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "contest", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
 	@JsonIgnore
-	public List<Submission> backups = new ArrayList<Submission>();
+	private List<Submission> subs = new ArrayList<Submission>();
 
-	public Calendar calendar = Calendar.getInstance();
+	private Calendar calendar = Calendar.getInstance();
 	public int sub_count = 0;
 
-	public String winning_description;
-
-	public String winning_content_url;
-
-	public String winning_content_type;
+	public int winning_index;
 
 	@SuppressWarnings("deprecation")
 	public Contest() {
 		Date today = new Date();
 		calendar.setTime(new Date());
-		calendar.add(Calendar.DATE, 1);
+		calendar.add(Calendar.MINUTE, 1);
 		sub_count = 0;
 	}
 
-	public void loadSubmission(Submission sub) {
-		winning_description = sub.description;
-		winner = sub.member;
-		winning_content_url = sub.content_url;
-		winning_content_type = sub.content_type;
+	public void loadSubmission(int index) {
+		winning_index = index;
 	}
 
 	public void nullify() {
-		winning_description = null;
-		winner = null;
-		winning_content_url = null;
-		winning_content_type = null;
+		winning_index = -1;
+	}
+
+	public long getId() {
+		return id;
+	}
+
+	public List<Submission> getSubs() {
+		return subs;
+	}
+
+	public Calendar getCalendar() {
+		return calendar;
+	}
+
+	public int getSub_count() {
+		return sub_count;
+	}
+
+	public int getWinning_index() {
+		return winning_index;
 	}
 
 }
